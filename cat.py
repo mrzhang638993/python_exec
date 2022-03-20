@@ -1,5 +1,6 @@
 import cv2
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 # 图片对应的是BGR的显示操作的。
@@ -171,7 +172,29 @@ def threshold(path):
         plt.title(titles[i])
         plt.xticks([])
         plt.yticks([])
-        plt.show()
+    plt.show()
+
+
+# 执行图像的平滑操作处理实现,对应的可以执行相关的滤波操作实现
+def flat(path):
+    img = cv2.imread(path)
+    # 执行滤波操作处理实现,对应的（3,3）体现的是滤波操作处理实现
+    # 卷积操作,对应的是均值滤波的一种实现。
+    blur = cv2.blur(img, (3, 3))
+    # 方框滤波操作实现，-1表示和颜色通道一直的，normalize对应的代表的是归一化的操作的
+    # 方差滤波以及均值滤波差别的一点对应的是归一化的操作的，配置参数体现的是normalize=True,当配置成为这样的时候，是一样的。
+    # 如果normalize=false的，对应的如果大于255的话，对应的都是会设置成为255的
+    # blur = cv2.boxFilter(img, -1, (3, 3), normalize=True)
+    # 下面对应的是高斯滤波的方式和实现的。对应的是根据高斯分布来实现补偿的，符合高斯分布操作的。
+    gause = cv2.GaussianBlur(img, (5, 5,), 1)
+    # 执行中值滤波操作实现
+    mediam = cv2.medianBlur(img, 5)
+    # 使用numpy一次打印多个数据,可以进行效果的比对操作实现和管理的。
+    img = [blur, gause, mediam]
+    res = np.hstack(img)
+    print(res)
+    # plt.imshow(blur)
+    # plt.show()
 
 
 if __name__ == "__main__":
@@ -187,4 +210,5 @@ if __name__ == "__main__":
     # b("C:\\Users\\mrzhang\\2022\\cat.jpg", "cat")
     # g("C:\\Users\\mrzhang\\2022\\cat.jpg", "cat")
     # calc()
-    threshold("C:\\Users\\mrzhang\\2022\\cat.jpg")
+    # threshold("C:\\Users\\mrzhang\\2022\\cat.jpg")
+    flat("C:\\Users\\mrzhang\\2022\\lenaNoise.png")
