@@ -197,6 +197,97 @@ def flat(path):
     # plt.show()
 
 
+# 图形的腐蚀操作,主要用于二值操作的情况下
+def erode(path):
+    # 这里面定义了(3,3)的卷积核
+    kernel = np.ones((3, 3), np.uint8)
+    img = cv2.imread(path)
+    # 这里面定义了腐蚀的次数信息的,不同的腐蚀次数的话，腐蚀的区域是会越大的。
+    erosion = cv2.erode(img, kernel, iterations=1)
+    plt.imshow(erosion)
+    plt.show()
+
+
+# 测试不同的腐蚀次数下面的展示的效果,迭代测试越多的话,对应的腐蚀的效果越明显的。
+def iterations(path):
+    img = cv2.imread(path)
+    kernel = np.ones((20, 20), np.uint8)
+    img1 = cv2.erode(img, kernel, iterations=1)
+    img2 = cv2.erode(img, kernel, iterations=2)
+    img3 = cv2.erode(img, kernel, iterations=3)
+    img = [img1, img2, img3]
+    res = np.hstack(img)
+    cv2.imshow("stack", res)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+# 图形的膨胀操作实现,腐蚀操作对原来的对象是有损害的，需要增加膨胀的操作来实现修复损害的作用的。
+# 膨胀和腐蚀对应的是一个逆运算的操作的。
+def dilate(path):
+    img = cv2.imread(path)
+    # 执行腐蚀操作,消除多余的元素。
+    kernel = np.ones((3, 3), np.uint8)
+    erode = cv2.erode(img, kernel)
+    # 执行膨胀操作。
+    # 定义膨胀的kernel信息
+    dialateKernel = np.ones((5, 5), np.uint8)
+    dialate = cv2.dilate(erode, dialateKernel, iterations=2)
+    plt.imshow(dialate)
+    plt.show()
+
+
+# 定义开运算,可以将腐蚀和膨胀对应的定义在一起,执行相关的操作实现的。
+# 开运算对应的会执行如下的操作:先进行腐蚀操作,然后进行膨胀操作实现的。
+def open(path):
+    img = cv2.imread(path)
+    # 定义卷积核操作实现
+    kernel = np.ones((3, 3), np.uint8)
+    last = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+    plt.imshow(last)
+    plt.show()
+
+
+# 执行闭运算操作实现,对应的是首先进行膨胀操作,然后进行腐蚀操作实现的。
+def close(path):
+    img = cv2.imread(path)
+    kernel = np.ones((3, 3), np.uint8)
+    last = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+    plt.imshow(last)
+    plt.show()
+
+
+# 执行梯度运算操作,梯度运算=膨胀结果-腐蚀结果
+# 执行梯度运算的结果实现操作。
+def gradient(path):
+    img = cv2.imread(path)
+    # 定义卷积核的操作实现
+    kernel = np.ones((7, 7), np.uint8)
+    # 执行梯度计算操作实现
+    gradient = cv2.morphologyEx(img, cv2.MORPH_GRADIENT, kernel)
+    plt.imshow(gradient)
+    plt.show()
+
+
+# 对应的执行相关的礼帽的运算和输出操作实现。礼帽的运算结果如下=原始计算结果-开运算的结果
+def limao(path):
+    img = cv2.imread(path)
+    kernel = np.ones((7, 7), np.uint8)
+    limao = cv2.morphologyEx(img, cv2.MORPH_TOPHAT, kernel)
+    plt.imshow(limao)
+    plt.show()
+
+
+# 执行黑帽运算操作实现
+# 对应的黑猫运算的结果是如下的:黑帽运算结果如下=闭运算的计算结果-原始的图形结果
+def heimao(path):
+    img = cv2.imread(path)
+    kernel = np.ones((7, 7), np.uint8)
+    heimao = cv2.morphologyEx(img, cv2.MORPH_BLACKHAT, kernel)
+    plt.imshow(heimao)
+    plt.show()
+
+
 if __name__ == "__main__":
     # 读取彩色图片操作实现
     # cv_show("C:\\Users\\mrzhang\\2022\\cat.jpg", "cat",cv2.IMREAD_COLOR)
@@ -211,4 +302,12 @@ if __name__ == "__main__":
     # g("C:\\Users\\mrzhang\\2022\\cat.jpg", "cat")
     # calc()
     # threshold("C:\\Users\\mrzhang\\2022\\cat.jpg")
-    flat("C:\\Users\\mrzhang\\2022\\lenaNoise.png")
+    # flat("C:\\Users\\mrzhang\\2022\\lenaNoise.png")
+    # erode("C:\\Users\\mrzhang\\2022\\dige.png")
+    # iterations("C:\\Users\\mrzhang\\2022\\pie.png")
+    # dilate("C:\\Users\\mrzhang\\2022\\dige.png")
+    # open("C:\\Users\\mrzhang\\2022\\dige.png")
+    # close("C:\\Users\\mrzhang\\2022\\dige.png")
+    # gradient("C:\\Users\\mrzhang\\2022\\pie.png")
+    # limao("C:\\Users\\mrzhang\\2022\\dige.png")
+    heimao("C:\\Users\\mrzhang\\2022\\dige.png")
