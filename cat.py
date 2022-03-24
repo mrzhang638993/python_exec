@@ -288,6 +288,193 @@ def heimao(path):
     plt.show()
 
 
+# 执行梯度计算的算子操作实现，在边缘检测的时候，可以使用到这样的方式实现梯度计算操作的。
+def sobel(path):
+    img = cv2.imread(path)
+    # opencv默认的情况下会将负值截断为0的,但是负值是允许的。cv2.CV_64F代表的是将数据转换成为了负数形式的
+    # dx=1 代表的是计算水平的梯度，dy=0代表的是计算垂直方向的梯度的。
+    # ksize=3代表的是代表的是卷积核的大小的，3*3的卷积核进行操作的。
+    sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=3)
+    # 下面需要将负数进行绝对值转换的，对应的操作是如下的
+    sobelx = cv2.convertScaleAbs(sobelx)
+    # 下面计算y方向的相关的梯度运算结果的
+    sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=3)
+    sobely = cv2.convertScaleAbs(sobely)
+    # 不建议直接计算dx以及dy的数值的，建议分开计算的，那样效果比较的好的。
+    # cv2.Sobel(img, cv2.CV_64F, 1, 1, ksize=3) 对应的是一起计算的操作实现的。
+    sobel = cv2.addWeighted(sobelx, 0.5, sobely, 0.5, 0)
+    plt.imshow(sobel)
+    plt.show()
+
+
+# 测试梯度计算的结果操作实现，效果比较优化的那种操作
+def sobelfact(path):
+    # 加载灰度图片
+    img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+    # 分别计算dx以及dy方向的边界,得到对应的轮廓图
+    sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=3)
+    sobelx = cv2.convertScaleAbs(sobelx)
+    sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=3)
+    sobely = cv2.convertScaleAbs(sobely)
+    sobel = cv2.addWeighted(sobelx, 0.5, sobely, 0.5, 0)
+    plt.imshow(sobel)
+    plt.show()
+
+
+# 梯度计算的算子scharr，相比较于Sobel算子而言，对应的差异会更加的明显的。可以捕捉到更加丰富的梯度信息的。
+def scharr(path):
+    # 使用灰度图导入的方式实现操作管理
+    img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+    scharrx = cv2.Scharr(img, cv2.CV_64F, 1, 0)
+    scharrx = cv2.convertScaleAbs(scharrx)
+    scharry = cv2.Scharr(img, cv2.CV_64F, 0, 1)
+    scharry = cv2.convertScaleAbs(scharry)
+    scharr = cv2.addWeighted(scharrx, 0.5, scharry, 0.5, 0)
+    plt.imshow(scharr)
+    plt.show()
+
+
+# 对应的体现的是laplacian梯度计算的方式的，对应的laplacian需要结合其他的方式来实现精准的梯度计算的。
+def laplacian(path):
+    img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+    lap = cv2.Laplacian(img, cv2.CV_64F)
+    lap = cv2.convertScaleAbs(lap)
+    plt.imshow(lap)
+    plt.show()
+
+
+# 执行边缘检测算法操作,边缘检测算法操作,canny是一整套的完整的解决方案的。
+# 对应的边界的范围设置的越大的话，对应的细节是越清晰的。范围越小的话，对应的细节是会越概略的。
+# canny的边缘检测主要包括了如下的多个步骤的：
+'''
+步骤1: 使用高斯滤波器进行滤波处理，平滑头像，降低噪声
+步骤2：计算图像中的每一个像素点的梯度强度和反向
+步骤3：使用非极大值抑制，以消除边缘检测所带来的杂散效应
+步骤4：使用双阈值确定真实和潜在的边缘
+步骤5：通过抑制孤立的弱边缘最终完成边缘检测
+'''
+
+
+def canny(path):
+    img = cv2.imread(path)
+    # 设置上限和下限值,设置的上限值以及下限值是比较的大的
+    can1 = cv2.Canny(img, 80, 150)
+    # 设置的下限值是比较的大的
+    can2 = cv2.Canny(img, 50, 150)
+    plt.imshow(can1)
+    plt.show()
+    plt.imshow(can2)
+    plt.show()
+
+
+# 使用更大范围的图片来实现相关的数据的canny数据探测操作实现的
+def cannyfact(path):
+    img = cv2.imread(path)
+    can1 = cv2.Canny(img, 120, 250)
+    # 设置的下限值是比较的大的
+    can2 = cv2.Canny(img, 50, 150)
+    plt.imshow(can1)
+    plt.show()
+    plt.imshow(can2)
+    plt.show()
+
+
+# 图像金字塔的上采样以及下采样操作实现
+'''
+需要注意的是在上采样的过程中以及下采样的过程中，
+对应的都是会损失相关的精度的数据的。所以，不存在经历过一次上下采样之后，对应的不丢失数据的过程的。
+过程中都是会存在信息的丢失的过程的。
+'''
+
+
+def pyr(path):
+    img = cv2.imread(path)
+    # 执行金字塔的上采样操作实现
+    pyrUp = cv2.pyrUp(img)
+    # 执行金字塔的下采样操作实现
+    pyrDown = cv2.pyrDown(img)
+    cv_show(pyrUp)
+    cv_show(pyrDown)
+    # 对应的继续执行上采样的操作实现的
+    pyrUpnext = cv2.pyrUp(pyrUp)
+    cv_show(pyrUpnext)
+
+
+# 定义展示的方法
+def cv_show(img):
+    plt.imshow(img)
+    plt.show()
+
+
+'''
+定义拉普拉斯金字塔实现相关的图像的操作处理实现,
+对应的是先执行down操作，后续执行up操作的。
+比较初始的推行和后续的一套down-up之后的结果的
+单一层次的计算是这样的，但是多层次的话，是不同的，需要进行关注的。
+可以抽取不同层次的有价值的东西的，可以实现多个层次不同的价值的融合操作的。
+'''
+
+
+def pyrlapu(path):
+    img = cv2.imread(path)
+    down = cv2.pyrDown(img)
+    up = cv2.pyrUp(down)
+    dest = img - up
+    plt.imshow(dest)
+    plt.show()
+
+
+# 轮廓检测操作实现，轮廓相教于边缘检测而言，需要的是完整性的相关的内容的。
+def contours(path):
+    img = cv2.imread(path)
+    # 转换成为灰度图
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # 使用阈值操作，转化成为二值图，0和255的那种，得到二值图操作
+    ret, thrsh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+    # 下面使用二值图执行边缘检测操作实现，使用边缘检测操作的话，对应的是需要二值图的。这个是关键的信息的
+    binary, counters, hierarchy = cv2.findContours(thrsh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    # 执行copy操作，否则的话，对应的原图会修改相关的内容的,如果不拷贝的话，是会在原始图上不断的修改的
+    img_copy = img.copy()
+    # counters对应的是shape信息的，是一个数组的。-1代表的是将所有的轮廓全部展示的。0, 0, 255对应的是bgr的颜色的模式的，对应的是红色的。2代表的是颜色的宽度
+    counter = cv2.drawContours(img_copy, counters, -1, (0, 0, 255), 2)
+    plt.imshow(counter)
+    plt.show()
+    # 指定特定的轮廓，开始计算相关的轮廓的特征信息的.对于轮廓的话，是需要根据索引来获取的。
+    cnt = counters[0]
+    # 计算轮廓的面积
+    area = cv2.contourArea(cnt)
+    print(area)
+    # 计算轮廓的周长
+    length = cv2.arcLength(cnt, True)
+    print(length)
+
+
+# 执行轮廓的近似操作实现和管理实现
+def approx(path):
+    img = cv2.imread(path)
+    # 转换成为灰度图
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # 使用阈值操作，转化成为二值图，0和255的那种，得到二值图操作
+    ret, thrsh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+    # 下面使用二值图执行边缘检测操作实现，使用边缘检测操作的话，对应的是需要二值图的。这个是关键的信息的
+    binary, counters, hierarchy = cv2.findContours(thrsh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    # 执行copy操作，否则的话，对应的原图会修改相关的内容的,如果不拷贝的话，是会在原始图上不断的修改的
+    img_copy = img.copy()
+    # 对应的代表的是需要处理的轮廓的特征和参数信息
+    cnt = counters[0]
+    # 对应的是轮廓特征的提取操作实现
+    # res = cv2.drawContours(img_copy, [cnt], -1, (0, 0, 255), 2)
+    # plt.imshow(res)
+    # plt.show()
+    # 下面进行轮廓特征的近似操作实现
+    epsilon = 0.1 * cv2.arcLength(cnt, True)
+    # approx代表的是轮廓的特征信息的，使用的是近似的轮廓的操作实现的。
+    approx = cv2.approxPolyDP(cnt, epsilon, True)
+    res = cv2.drawContours(img_copy, [approx], -1, (0, 0, 255), 2)
+    plt.imshow(res)
+    plt.show()
+
+
 if __name__ == "__main__":
     # 读取彩色图片操作实现
     # cv_show("C:\\Users\\mrzhang\\2022\\cat.jpg", "cat",cv2.IMREAD_COLOR)
@@ -310,4 +497,14 @@ if __name__ == "__main__":
     # close("C:\\Users\\mrzhang\\2022\\dige.png")
     # gradient("C:\\Users\\mrzhang\\2022\\pie.png")
     # limao("C:\\Users\\mrzhang\\2022\\dige.png")
-    heimao("C:\\Users\\mrzhang\\2022\\dige.png")
+    # heimao("C:\\Users\\mrzhang\\2022\\dige.png")
+    # sobel("C:\\Users\\mrzhang\\2022\\pie.png")
+    # sobelfact("C:\\Users\\mrzhang\\2022\\lena.jpg")
+    # scharr("C:\\Users\\mrzhang\\2022\\lena.jpg")
+    # laplacian("C:\\Users\\mrzhang\\2022\\lena.jpg")
+    # canny("C:\\Users\\mrzhang\\2022\\lena.jpg")
+    # cannyfact("C:\\Users\\mrzhang\\2022\\car.png")
+    # pyr("C:\\Users\\mrzhang\\2022\\AM.png")
+    # pyrlapu("C:\\Users\\mrzhang\\2022\\AM.png")
+    # contours("C:\\Users\\mrzhang\\2022\\contours.png")
+    approx("C:\\Users\\mrzhang\\2022\\contours2.png")
