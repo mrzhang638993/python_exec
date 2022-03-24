@@ -473,6 +473,88 @@ def approx(path):
     res = cv2.drawContours(img_copy, [approx], -1, (0, 0, 255), 2)
     plt.imshow(res)
     plt.show()
+    # 还可以对应的形成外接矩形，外接圆等的图形的
+    x, y, w, h = cv2.boundingRect(cnt)
+    # 构造外接矩形和相关的内容
+    copy1 = img.copy()
+    tangle = cv2.rectangle(copy1, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    plt.imshow(tangle)
+    plt.show()
+    # 计算轮廓矩形和外接矩形的面积的对比操作和实现
+    # 计算轮廓的面积
+    area = cv2.contourArea(cnt)
+    # 获取外接矩形的数据信息
+    x, y, w, h = cv2.boundingRect(cnt)
+    react_area = w * h
+    extent = float(area) / react_area
+    print("轮廓面积和边界矩形面积之比", extent)
+
+
+# opencv中的模板匹配方式和操作实现,文件的缺失报错了，后续需要关注统一的异常处理操作。
+def templatematch(imgpath, remplatepath):
+    # 读取图片操作
+    img1 = cv2.imread(imgpath)
+    # 读取相关的模板操作实现
+    template = cv2.imread(remplatepath)
+    # 得到图形的shape数据信息
+    h, w = template.shape[:2]
+    # 执行模板匹配操作实现
+    res = cv2.matchTemplate(img1, template, cv2.TM_SQDIFF_NORMED)
+    # 执行对应的查找操作实现
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    # 匹配到了位置的话，后续的需要进行相关的数据匹配操作实现管理
+    bottom = (min_loc[0] + w, min_loc[1] + h)
+    img_copy = img1.copy()
+    # 绘制矩形执行操作实现
+    tangle = cv2.rectangle(img_copy, min_loc, bottom, 255, 2)
+    plt.imshow(tangle)
+    plt.show()
+
+
+# 人脸检测一般的使用机器学习的算法来实现的。不会使用到opencv来执行操作的。
+# 其他的几种模板匹配操作和比较
+def templatematchall(imgpath, remplatepath):
+    # 读取图片操作
+    img1 = cv2.imread(imgpath)
+    # 读取相关的模板操作实现
+    template = cv2.imread(remplatepath)
+    # 得到图形的shape数据信息
+    h, w = template.shape[:2]
+    methods = [cv2.TM_SQDIFF_NORMED, cv2.TM_SQDIFF, cv2.TM_CCOEFF, cv2.TM_CCOEFF_NORMED, cv2.TM_CCORR,
+               cv2.TM_CCORR_NORMED]
+    for method in methods:
+        # 执行模板匹配操作实现
+        res = cv2.matchTemplate(img1, template, cv2.TM_SQDIFF_NORMED)
+        # 执行对应的查找操作实现
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        if method in [cv2.TM_SQDIFF_NORMED, cv2.TM_SQDIFF]:
+            top_left = min_loc
+        else:
+            top_left = max_loc
+        bottom = (top_left[0] + w, top_left[1] + h)
+        img_copy = img1.copy()
+        tangle = cv2.rectangle(img_copy, top_left, bottom, 255, 2)
+        plt.imshow(tangle)
+        plt.show()
+
+
+# 模板的多匹配操作实现。多匹配操作的话，需要使用到阈值实现相关的操作的。
+def multimatch(imgpath, templatepath):
+    img = cv2.imread(imgpath)
+    grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    template = cv2.imread(templatepath, 0)
+    # 得到图形的shape数据信息
+    h, w = template.shape[:2]
+    # 计算相关的系数，系数越高的，对应的匹配程度越高的。
+    res = cv2.matchTemplate(grey, template, cv2.TM_CCOEFF_NORMED)
+    threshold = 0.8
+    loc = np.where(res >= threshold)
+    # *代表的是可选的参数,对应的是进行数组的大量的匹配操作的。
+    for pt in zip(*loc[::-1]):
+        bottom_right = (pt[0] + w, pt[1] + h)
+        cv2.rectangle(img, pt, bottom_right, (255, 0, 0), 2)
+    plt.imshow(img)
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -507,4 +589,7 @@ if __name__ == "__main__":
     # pyr("C:\\Users\\mrzhang\\2022\\AM.png")
     # pyrlapu("C:\\Users\\mrzhang\\2022\\AM.png")
     # contours("C:\\Users\\mrzhang\\2022\\contours.png")
-    approx("C:\\Users\\mrzhang\\2022\\contours2.png")
+    # approx("C:\\Users\\mrzhang\\2022\\contours2.png")
+    # templatematch("C:\\Users\\mrzhang\\2022\\lena.jpg", "C:\\Users\\mrzhang\\2022\\face.jpg")
+    # templatematchall("C:\\Users\\mrzhang\\2022\\lena.jpg", "C:\\Users\\mrzhang\\2022\\face.jpg")
+    multimatch("C:\\Users\\mrzhang\\2022\\mario.jpg", "C:\\Users\\mrzhang\\2022\\mario_coin.jpg")
